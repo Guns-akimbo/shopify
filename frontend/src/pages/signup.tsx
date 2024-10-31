@@ -1,0 +1,152 @@
+import { motion } from "framer-motion";
+import Input from "../components/input";
+import { User, Mail, Phone, Lock, Loader } from "lucide-react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import PasswordStrengthMeter from "../components/password-strength";
+import { useAuthStore } from "../store/authStore";
+import toast from "react-hot-toast";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { schema } from "../validation/auth/register";
+
+const Signup = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const { signup, error, isLoading } = useAuthStore();
+  const navigate = useNavigate();
+
+  const password = watch("password", "");
+  const firstname = watch("firstname", "");
+  const lastname = watch("lastname", "");
+  const email = watch("email", "");
+  const phonenumber = watch("phonenumber", "");
+
+  const isFormFilled =
+    firstname && password && lastname && email && phonenumber;
+
+  const onSubmit = async (data: any) => {
+    console.log(data);
+    try {
+      await signup(
+        data.firstname,
+        data.lastname,
+        data.email,
+        data.phonenumber,
+        data.password
+      );
+      toast.success(
+        "Welcome! Please verify your account; an email has been sent."
+      );
+      navigate("/emailverification");
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1 }}
+      className="max-w-md w-full bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden"
+    >
+      <div className="p-8">
+        <h2 className="text-3xl font-bold text-center bg-clip-text mb-6 bg-gradient-to-r from-green-400 to-emerald-500 text-transparent">
+          Create Account
+        </h2>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <p className="text-red-500 font-semibold text-xs">
+            {errors.firstname?.message}
+          </p>
+          <Input
+            icon={User}
+            type="text"
+            placeholder="Enter Firstname"
+            register={register}
+            name="firstname"
+          />
+          <p className="text-red-500 font-semibold text-xs">
+            {errors.lastname?.message}
+          </p>
+          <Input
+            icon={User}
+            type="text"
+            placeholder="Enter Lastname"
+            register={register}
+            name="lastname"
+          />
+          <p className="text-red-500 font-semibold text-xs">
+            {errors.email?.message}
+          </p>
+          <Input
+            icon={Mail}
+            type="email"
+            placeholder="Email Address"
+            register={register}
+            name="email"
+          />
+          <p className="text-red-500 font-semibold text-xs">
+            {errors.phonenumber?.message}
+          </p>
+          <Input
+            icon={Phone}
+            type="text"
+            placeholder="Enter Phone Number"
+            register={register}
+            name="phonenumber"
+          />
+          <p className="text-red-500 font-semibold text-xs">
+            {errors.password?.message}
+          </p>
+          <Input
+            icon={Lock}
+            type={showPassword ? "text" : "password"}
+            placeholder="Enter Password"
+            showPassword={showPassword}
+            handleShowPassword={() => setShowPassword(!showPassword)}
+            isPass={true}
+            register={register}
+            name="password"
+          />
+          {error && <p className="text-red-500 font-semibold mt-2">{error}</p>}
+          <PasswordStrengthMeter password={password} />
+          <motion.button
+            className={`mt-5 w-full py-3 px-4 bg-gradient-to-r ${
+              !isFormFilled
+                ? "from-gray-100 to-gray-300 text-white opacity-40 cursor-pointer"
+                : "from-green-500 to-emerald-600"
+            } text-white font-bold rounded-lg shadow-lg transition duration-200`}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            type="submit"
+            disabled={isLoading || !isFormFilled}
+          >
+            {isLoading ? (
+              <Loader className="animate-spin mx-auto" size={24} />
+            ) : (
+              "Sign Up"
+            )}
+          </motion.button>
+        </form>
+      </div>
+      <div className="px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center">
+        <p className="text-sm text-gray-400">
+          Already have an account?{" "}
+          <Link to="/login" className="text-green-400 hover:underline">
+            Login
+          </Link>
+        </p>
+      </div>
+    </motion.div>
+  );
+};
+
+export default Signup;
