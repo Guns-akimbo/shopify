@@ -2,10 +2,14 @@ import { create } from "zustand";
 import axios from "axios";
 import { user } from "../types";
 
-const BASE_URL = "http://localhost:9000/api/v1/auth";
+const BASE_URL =
+  import.meta.env.MODE === "development"
+    ? "http://localhost:9000/api/v1/auth"
+    : "/api/auth";
+
 
 // add cookies in every request
-axios.defaults.withCredentials = true;
+https: axios.defaults.withCredentials = true;
 
 interface BearState {
   user: user | null;
