@@ -5,7 +5,7 @@ import { user } from "../types";
 const BASE_URL =
   import.meta.env.MODE === "development"
     ? "http://localhost:9000/api/v1/auth"
-    : "/api/auth";
+    : "/api/v1/auth";
 
 
 // add cookies in every request
