@@ -1,5 +1,6 @@
 import express from "express";
 const PORT = process.env.PORT || 5000;
+const DB = process.env.DB
 import product from "./routes/product.js";
 import logger from "./middleware/loggermiddleware.js";
 import error from "./middleware/error.js";
@@ -8,8 +9,12 @@ import cors from "cors";
 import auth from "./routes/auth.js";
 import cookieParser from "cookie-parser";
 import path from "path";
+import dotenv from "dotenv";
+import mongoose from "mongoose"
 
 import { connectDB } from "./db/connectDB.js";
+
+dotenv.config();
 
 const app = express();
 const __dirname = path.resolve();
@@ -49,8 +54,21 @@ app.use(error);
 // Serve static files from the 'public' directory
 app.use("/public", express.static("public"));
 
+// app.listen(PORT, () => {
+//   connectDB();
+//   console.log(`server is running on ${PORT}`);
+// });
 
-app.listen(PORT, () => {
-  connectDB();
-  console.log(`server is running on ${PORT}`);
-});
+mongoose
+  .connect(DB)
+  .then(() => {
+    console.log("connected to database");
+  })
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`server is running on ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.log("connection failed", error.message);
+  });
