@@ -4,8 +4,10 @@ import { user } from "../types";
 
 const BASE_URL =
   import.meta.env.MODE === "development"
-    ? "http://localhost:9000/api/v1/auth"
-    : "/api/v1/auth";
+    ? "http://localhost:9000/api/v1"
+    : "/api/v1";
+
+const AUTH_URL = `${BASE_URL}/auth`;
 
 
 // add cookies in every request
@@ -44,7 +46,7 @@ export const useAuthStore = create<BearState>((set) => ({
   signup: async (firstname, lastname, email, phonenumber, password) => {
     set({ isLoading: true, error: null });
     try {
-      const res = await axios.post(`${BASE_URL}/register`, {
+      const res = await axios.post(`${AUTH_URL}/register`, {
         firstname,
         lastname,
         email,
@@ -63,7 +65,7 @@ export const useAuthStore = create<BearState>((set) => ({
   login: async (email, password) => {
     set({ isLoading: true, error: null });
     try {
-      const res = await axios.post(`${BASE_URL}/login`, {
+      const res = await axios.post(`${AUTH_URL}/login`, {
         email,
         password,
       });
@@ -84,7 +86,7 @@ export const useAuthStore = create<BearState>((set) => ({
   logout: async () => {
     set({ isLoading: true, error: null });
     try {
-      await axios.post(`${BASE_URL}/logout`);
+      await axios.post(`${AUTH_URL}/logout`);
       set({
         user: null,
         isAuthenticated: false,
@@ -101,7 +103,7 @@ export const useAuthStore = create<BearState>((set) => ({
   verifyEmail: async (code: string) => {
     set({ isLoading: true, error: null });
     try {
-      const res = await axios.post(`${BASE_URL}/verify`, { code });
+      const res = await axios.post(`${AUTH_URL}/verify`, { code });
       set({ user: res.data, isAuthenticated: true, isLoading: false });
     } catch (error: any) {
       set({
@@ -114,7 +116,7 @@ export const useAuthStore = create<BearState>((set) => ({
   checkAuth: async () => {
     set({ isCheckingAuth: true, error: null });
     try {
-      const res = await axios.get(`${BASE_URL}/checkAuth`);
+      const res = await axios.get(`${AUTH_URL}/checkAuth`);
       set({
         user: res.data.user,
         isAuthenticated: true,
@@ -132,7 +134,7 @@ export const useAuthStore = create<BearState>((set) => ({
   forgotpassword: async (email: string) => {
     set({ isLoading: true, error: null, message: null });
     try {
-      const res = await axios.post(`${BASE_URL}/forgotPassword`, {
+      const res = await axios.post(`${AUTH_URL}/forgotPassword`, {
         email,
       });
       set({ message: res.data.message, isLoading: false });
@@ -147,7 +149,7 @@ export const useAuthStore = create<BearState>((set) => ({
   resetPassword: async (token: string, password: string) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(`${BASE_URL}/resetPassword/${token}`, {
+      const response = await axios.post(`${AUTH_URL}/resetPassword/${token}`, {
         password,
       });
       set({ message: response.data.message, isLoading: false });
